@@ -2,13 +2,13 @@ const express = require('express');
 const authMiddleware = require('../middlewares/auth');
 const router = express.Router();
 const Produto = require('../models/produto');
+const ProdutoMarcaCategoria = require('../models/produtoMarca');
 const Marca = require('../models/marca');
 
 //Exibe toda a lista de produtos de forma pública
 router.get('/', async (req, res) => {
     try {
         const produto = await Produto.findAll();
-        console.log(produto)
         if (produto == "") {
             return res.json({ mensagem: "Não existe nenhum produto cadastrado" });
         } else {
@@ -89,11 +89,11 @@ router.delete('/:produtoId', async (req, res) => {
 });
 
 //Altera dados de um produto
-router.patch('/:nomeProduto', async (req, res) => {
+router.patch('/:produtoId', async (req, res) => {
 
     try {
         const produto = await Produto.findOne({
-            where: {nome: req.params.nomeProduto}
+            where: {id: req.params.produtoId}
         })
 
         if (produto.nome != '' || produto.nome != null) {

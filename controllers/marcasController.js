@@ -1,16 +1,8 @@
 const express = require('express');
 const authMiddleware = require('../middlewares/auth');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const authConfig = require('../config/auth.json');
 const Marca = require('../models/marca');
 
-function generateToken(params = {}) {
-    return jwt.sign(params, authConfig.SECRET, {
-        expiresIn: 60 * 60,
-    });
-}
 
 //Exibe toda a lista de marcas de forma pública
 router.get('/', async (req, res) => {
@@ -27,11 +19,11 @@ router.get('/', async (req, res) => {
 });
 
 //Exibe um item específico da lista de marcas de forma pública
-router.get('/:idMarca', async (req, res) => {
+router.get('/:marcaId', async (req, res) => {
     try {
         const marca = await Marca.findOne({
             where: {
-                id: req.params.idMarca
+                id: req.params.marcaId
             }
         });
 
