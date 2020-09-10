@@ -2,13 +2,15 @@ const express = require('express');
 const authMiddleware = require('../middlewares/auth');
 const router = express.Router();
 const Produto = require('../models/produto');
-const ProdutoMarcaCategoria = require('../models/produtoMarca');
 const Marca = require('../models/marca');
+const ProdutoMarca = require('../models/produtoMarca');
 
 //Exibe toda a lista de produtos de forma pública
 router.get('/', async (req, res) => {
     try {
         const produto = await Produto.findAll();
+        const produtoMarca = await ProdutoMarca.findAll();
+        console.log(produtoMarca);
         if (produto == "") {
             return res.json({ mensagem: "Não existe nenhum produto cadastrado" });
         } else {

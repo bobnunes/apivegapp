@@ -9,10 +9,10 @@ const Marca = sequelize.define( 'marcas', {
 });
 Marca.associate = (models) => {
     Marca.belongsToMany(models.produtos, {
-        through: 'produtoMarcaCategorias',
+        through: 'produtoMarcas',
         as: 'produtos',
         foreingKey: 'marcaId'
     });
   };
-  //Marca.sync()
+//Marca.sync({force: true})
 module.exports = Marca;

@@ -19,5 +19,5 @@ Adm.prototype.toJSON =  function () {
     delete values.senha;
     return values;
   }
-//Adm.sync()
+//Adm.sync({force: true})
 module.exports = Adm;

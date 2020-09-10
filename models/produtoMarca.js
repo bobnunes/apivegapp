@@ -2,7 +2,7 @@ const sequelize = require('../database/db');
 const Sequelize = require('sequelize');
 
 
-const ProdutoMarcaCategoria = sequelize.define('produtoMarcaCategorias', {
+const ProdutoMarca = sequelize.define('produtoMarcas', {
     produtoId: {
         type: Sequelize.INTEGER,
         references: {
@@ -19,14 +19,6 @@ const ProdutoMarcaCategoria = sequelize.define('produtoMarcaCategorias', {
         },
         allowNull: false
       },
-      categoriaId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'categorias',
-          key: 'id'
-        },
-        allowNull: false
-      },
 });
-//ProdutoMarcaCategoria.sync()
-module.exports = ProdutoMarcaCategoria; 
+//ProdutoMarca.sync({force: true})
+module.exports = ProdutoMarca; 

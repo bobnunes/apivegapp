@@ -8,19 +8,27 @@ const Produto = sequelize.define('produtos', {
         type: Sequelize.STRING,
         require: true
     },
+    categoriaId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'categorias',
+          key: 'id'
+        },
+        allowNull: false
+      },
 
 });
 Produto.associate = (models) => {
     Produto.belongsTo(models.categorias, {
-        through: 'produtoMarcaCategorias',
+        through: 'produtoMarcas',
         as: 'categorias',
         foreingKey: 'produtoId'
     });
     Produto.belongsToMany(models.marcas, {
-        through: 'produtoMarcaCategorias',
+        through: 'produtoMarcas',
         as: 'marcas',
         foreingKey: 'produtoId'
     });
   };
-//Produto.sync()
+//Produto.sync({force: true})
 module.exports = Produto; 

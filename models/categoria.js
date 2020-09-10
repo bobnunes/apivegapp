@@ -9,10 +9,10 @@ const Categoria = sequelize.define( 'categorias', {
 });
 Categoria.associate = (models) => {
     Categoria.hasMany(models.produtos, {
-        through: 'produtoMarcaCategorias',
+        through: 'produtos',
         as: 'produtos',
         foreingKey: 'categoriaId'
     });
   };
-//Categoria.sync()
+//Categoria.sync({force: true})
 module.exports = Categoria;
