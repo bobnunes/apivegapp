@@ -1,20 +1,22 @@
 const express = require('express');
 const authMiddleware = require('../middlewares/auth');
 const router = express.Router();
-const Produto = require('../models/produto');
-const Marca = require('../models/marca');
-const ProdutoMarca = require('../models/produtoMarca');
+const { sequelize } = require('../models/index');
+
 
 //Exibe toda a lista de produtos de forma pública
 router.get('/', async (req, res) => {
     try {
-        const produto = await Produto.findAll();
-        const produtoMarca = await ProdutoMarca.findAll();
-        console.log(produtoMarca);
+        const produto = await sequelize.models.produto.findAll({
+            include: { 
+                association: 'categoria'    // Falta incluir marcas
+                }
+        });
+        console.log(produto);
         if (produto == "") {
             return res.json({ mensagem: "Não existe nenhum produto cadastrado" });
         } else {
-            return res.json( produto );
+            return res.json({ produto });
         }
     } catch (err) {
         return res.json({ mensagem: err })
@@ -24,7 +26,7 @@ router.get('/', async (req, res) => {
 //Exibe um item específico da lista de produtos de forma pública
 router.get('/:nomeProduto', async (req, res) => {
     try {
-        const produto = await Produto.findOne({
+        const produto = await sequelize.models.produto.findOne({
             where: {
                 id: req.params.nomeProduto
             }
@@ -45,17 +47,18 @@ router.get('/:nomeProduto', async (req, res) => {
 router.post('/cadastro', async (req, res) => {
 
     try {
-
-        const produto = {
-            nome: req.body.nome,
-        };
-
-        if (await Produto.findOne({ where: { nome: req.body.nome } }))
+        
+        
+        
+        
+        if (await sequelize.models.produto.findOne({ where: { nome: req.body.nome } }))
             return res.status(400).send({ error: 'Esse produto já existe' });
 
-        await Produto.create(produto);
-        
-
+        const produto  = await sequelize.models.produto.create({
+            nome: req.body.nome,
+            categoriaId: req.body.categoriaId
+        })
+        console.log(produto)
         return res.send(produto);
 
     } catch (err) {
@@ -70,7 +73,7 @@ router.post('/cadastro', async (req, res) => {
 router.delete('/:produtoId', async (req, res) => {
 
     try {
-        const produto = await Produto.findOne({
+        const produto = await sequelize.models.produto.findOne({
             where: {
                 id: req.params.produtoId
             }
@@ -79,7 +82,7 @@ router.delete('/:produtoId', async (req, res) => {
         if (produto == null) {
             res.json({ message: "Esse produto não existe" });
         } else {
-            await Produto.destroy({ where: { id: req.params.produtoId } });
+            await sequelize.models.produto.destroy({ where: { id: req.params.produtoId } });
             res.json({ mensagem: "Produto deletado com sucesso" })
         }
 
@@ -94,12 +97,12 @@ router.delete('/:produtoId', async (req, res) => {
 router.patch('/:produtoId', async (req, res) => {
 
     try {
-        const produto = await Produto.findOne({
+        const produto = await sequelize.models.produto.findOne({
             where: {id: req.params.produtoId}
         })
 
         if (produto.nome != '' || produto.nome != null) {
-            await produto.update({ nome: req.body.nome });
+            await sequelize.models.produto.update({ nome: req.body.nome });
             return res.send({produto});
         } else {
             return res.send({ mensagem: "Esse produto não foi encontrado" });

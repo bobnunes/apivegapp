@@ -1,5 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middlewares/auth');
+const { sequelize } = require('../models');
 const router = express.Router();
 const Marca = require('../models/marca');
 
@@ -7,7 +8,7 @@ const Marca = require('../models/marca');
 //Exibe toda a lista de marcas de forma pública
 router.get('/', async (req, res) => {
     try {
-        const marca = await Marca.findAll();
+        const marca = await sequelize.models.marca.findAll();
         if (marca == "") {
             return res.json({ mensagem: "Não existe nenhuma marca cadastrada" });
         } else {
@@ -21,7 +22,7 @@ router.get('/', async (req, res) => {
 //Exibe um item específico da lista de marcas de forma pública
 router.get('/:marcaId', async (req, res) => {
     try {
-        const marca = await Marca.findOne({
+        const marca = await sequelize.models.marca.findOne({
             where: {
                 id: req.params.marcaId
             }
@@ -38,7 +39,7 @@ router.get('/:marcaId', async (req, res) => {
     }
 });
 
-router.use(authMiddleware); //A partir da Middleware só executa a rota com autenticação
+//router.use(authMiddleware); //A partir da Middleware só executa a rota com autenticação
 router.post('/cadastro', async (req, res) => {
 
     try {
@@ -47,10 +48,10 @@ router.post('/cadastro', async (req, res) => {
             nome: req.body.nome,
         }
 
-        if (await Marca.findOne({ where: { nome: req.body.nome } }))
+        if (await sequelize.models.marca.findOne({ where: { nome: req.body.nome } }))
             return res.status(400).send({ error: 'Essa marca já existe' });
 
-        await Marca.create(marca);
+        await sequelize.models.marca.create(marca);
         return res.send({ marca });
 
     } catch (err) {
@@ -65,7 +66,7 @@ router.post('/cadastro', async (req, res) => {
 router.delete('/:nomeMarca', async (req, res) => {
 
     try {
-        const marca = await Marca.findOne({
+        const marca = await sequelize.models.marca.findOne({
             where: {
                 nome: req.params.nomeMarca
             }
@@ -74,7 +75,7 @@ router.delete('/:nomeMarca', async (req, res) => {
         if (marca == null) {
             res.json({ message: "Essa marca não existe" });
         } else {
-            await Marca.destroy({ where: { nome: req.params.nomeMarca } });
+            await sequelize.models.marca.destroy({ where: { nome: req.params.nomeMarca } });
             res.json({ mensagem: "Marca deletada com sucesso" })
         }
 
@@ -89,12 +90,12 @@ router.delete('/:nomeMarca', async (req, res) => {
 router.patch('/:nomeMarca', async (req, res) => {
 
     try {
-        const marca = await Marca.findOne({
+        const marca = await sequelize.models.marca.findOne({
             where: {nome: req.params.nomeMarca}
         })
 
         if (marca.nome != '' || marca.nome != null) {
-            await marca.update({ nome: req.body.nome });
+            await sequelize.models.marca.update({ nome: req.body.nome });
             return res.send({marca});
         } else {
             return res.send({ mensagem: "Essa marca não foi encontrada" });

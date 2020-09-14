@@ -1,24 +1,24 @@
-const sequelize = require('../database/db');
-const Sequelize = require('sequelize');
-
-
-const ProdutoMarca = sequelize.define('produtoMarcas', {
-    produtoId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'produtos',
-          key: 'id'
-        },
-        allowNull: false
-      },
-      marcaId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'marcas',
-          key: 'id'
-        },
-        allowNull: false
-      },
-});
-//ProdutoMarca.sync({force: true})
-module.exports = ProdutoMarca; 
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class produtoMarca extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  };
+  produtoMarca.init({
+    produtoId: DataTypes.INTEGER,
+    marcaId: DataTypes.INTEGER
+  }, {
+    sequelize,
+    modelName: 'produtoMarca',
+  });
+  return produtoMarca;
+};

@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Categoria = require('../models/categoria');
 const authMiddleware = require('../middlewares/auth');
+const { sequelize } = require('../models');
 
 //Exibe toda a lista de Categorias de forma pública
 router.get('/', async (req, res) => {
     try {
-        const categoria = await Categoria.findAll();
+        const categoria = await sequelize.models.categoria.findAll();
         if (categoria == "") {
             return res.json({ mensagem: "Não existe nenhum categoria cadastrado" });
         } else {
@@ -20,7 +21,7 @@ router.get('/', async (req, res) => {
 //Exibe um item específico da lista de categorias de forma pública
 router.get('/:nomeCategoria', async (req, res) => {
     try {
-        const categoria = await Categoria.findOne({
+        const categoria = await sequelize.models.categoria.findOne({
             where: {
                 nome: req.params.nomeCategoria
             }
@@ -40,7 +41,7 @@ router.get('/:nomeCategoria', async (req, res) => {
 
 // Comentar post depois de criar as categorias
 
-router.use(authMiddleware);
+//router.use(authMiddleware);
 router.post('/cadastro', async (req, res) => {
 
     try {
@@ -48,10 +49,10 @@ router.post('/cadastro', async (req, res) => {
             nome: req.body.nome,
         }
 
-        if (await Categoria.findOne({ where: { nome: req.body.nome } }))
+        if (await sequelize.models.categoria.findOne({ where: { nome: req.body.nome } }))
             return res.status(400).send({ error: 'Esse categoria já existe' });
 
-        await Categoria.create(categoria);
+        await sequelize.models.categoria.create(categoria);
         return res.send({ categoria });
 
     } catch (err) {

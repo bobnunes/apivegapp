@@ -1,18 +1,23 @@
-const sequelize = require('../database/db');
-const Sequelize = require('sequelize');
-
-const Marca = sequelize.define( 'marcas', {
-    nome: {
-        type: Sequelize.STRING,
-        require: true
-    },
-});
-Marca.associate = (models) => {
-    Marca.belongsToMany(models.produtos, {
-        through: 'produtoMarcas',
-        as: 'produtos',
-        foreingKey: 'marcaId'
-    });
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class marca extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      marca.belongsToMany(models.produto, { through: 'produtoMarca', foreignKey: 'produtoId', as: 'produtos' } );
+    }
   };
-//Marca.sync({force: true})
-module.exports = Marca;
+  marca.init({
+    nome: DataTypes.STRING
+  }, {
+    sequelize,
+    modelName: 'marca',
+  });
+  return marca;
+};

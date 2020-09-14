@@ -1,34 +1,24 @@
-const sequelize = require('../database/db');
-const Sequelize = require('sequelize');
-const db = require('../config/db');
-
-
-const Produto = sequelize.define('produtos', {
-    nome: {
-        type: Sequelize.STRING,
-        require: true
-    },
-    categoriaId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'categorias',
-          key: 'id'
-        },
-        allowNull: false
-      },
-
-});
-Produto.associate = (models) => {
-    Produto.belongsTo(models.categorias, {
-        through: 'produtoMarcas',
-        as: 'categorias',
-        foreingKey: 'produtoId'
-    });
-    Produto.belongsToMany(models.marcas, {
-        through: 'produtoMarcas',
-        as: 'marcas',
-        foreingKey: 'produtoId'
-    });
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class produto extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      produto.belongsTo(models.categoria, { foreignKey: 'categoriaId', as: 'categoria' } );
+      produto.belongsToMany(models.marca, { through: 'produtoMarca', foreignKey: 'marcaId', as: 'marcas' } );
+    }
   };
-//Produto.sync({force: true})
-module.exports = Produto; 
+  produto.init({
+    nome: DataTypes.STRING
+  }, {
+    sequelize,
+    modelName: 'produto',
+  });
+  return produto;
+};

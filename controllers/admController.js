@@ -1,10 +1,10 @@
 const express = require('express');
 const authMiddleware = require('../middlewares/auth');
-const Adm = require('../models/adm');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authConfig = require('../config/auth.json');
+const { sequelize } = require('../models/index');
 
 function generateToken(params = {}) {
     return jwt.sign(params, authConfig.SECRET, {
@@ -13,25 +13,25 @@ function generateToken(params = {}) {
 }
 //router.use(authMiddleware); //A partir da Middleware só executa a rota com autenticação
 //Exibe toda a lista de administradores de forma pública
-router.get('/',authMiddleware, async (req, res) => {
+router.get('/', async (req, res) => {
     try{
-        const adm = await Adm.findAll(
+        const adm = await sequelize.models.adm.findAll();
 
-        );
         if(adm==""){
-            return res.json({ mensagem: "Não existe nenhum administrador cadastrado" });
-        }else{
-            return res.json({ adm });
+            return res.json({ mensagem: "Não existem administradores cadastrados!" });
         }
+        
+            return res.json({ adm });
+        
     }catch(err){
         return res.json({ mensagem: err })
     }
 });
     
 //Exibe um item específico da lista de produtos de forma pública
-router.get('/:admId',authMiddleware, async (req, res) => {
+router.get('/:admId', async (req, res) => {
     try {
-        const adm = await Adm.findOne({ 
+        const adm = await sequelize.models.adm.findOne({ 
             where:{
                 id: req.params.admId 
             }
@@ -49,7 +49,7 @@ router.get('/:admId',authMiddleware, async (req, res) => {
 });
 
 
-router.post('/cadastrar',authMiddleware, async (req, res) => {
+router.post('/cadastrar', async (req, res) => {
 
     try {
 
@@ -59,19 +59,16 @@ router.post('/cadastrar',authMiddleware, async (req, res) => {
             senha: req.body.senha
         }
 
-
-        if (await Adm.findOne({
+        if (await sequelize.models.adm.findOne({
             where:{ 
                 email: req.body.email 
             } 
         }))
             return res.status(400).send({ error: 'Esse administrador já existe' });
             
-            const hash = bcrypt.hashSync(adm.senha, 10);
-            adm.senha = hash;
-            await Adm.create(adm);
+        await sequelize.models.adm.create(adm)
             
-            adm.senha = undefined;
+        //adm.senha = undefined;
             
         
         return res.json({
@@ -108,7 +105,7 @@ router.post('/autenticar', async (req, res) => {
 });
 
 //Deleta um produo específico
-router.delete('/deletar/:admId',authMiddleware, async (req, res) => {
+router.delete('/deletar/:admId', async (req, res) => {
 
     try {
         const adm = await Adm.findOne({ 
@@ -134,7 +131,7 @@ router.delete('/deletar/:admId',authMiddleware, async (req, res) => {
 });
 
 //Altera dados de um produto
-router.patch('/alterar/:admId',authMiddleware, async (req, res) => {
+router.patch('/alterar/:admId', async (req, res) => {
     
     const novoAdm = {
         nome: req.body.nome,
