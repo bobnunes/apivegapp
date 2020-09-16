@@ -86,17 +86,17 @@ router.post('/cadastrar', async (req, res) => {
 router.post('/autenticar', async (req, res) => {
 
     const {email, senha} = req.body;
-    const adm = await Adm.findOne({
+    const adm = await sequelize.models.adm.findOne({
         where:{ 
             email: req.body.email
         } 
     })
 
     if(!adm)
-        return res.status(400).send({ error: 'User not found' });
+        return res.status(400).send({ error: 'Usuário não existe' });
     
     if(!await bcrypt.compare(senha, adm.senha)){
-        return res.status(400).send({ error: 'Invalid password' });
+        return res.status(400).send({ error: 'Dados incorretos. Tente novamente.' });
     };
     res.send({ 
         adm,
@@ -108,14 +108,14 @@ router.post('/autenticar', async (req, res) => {
 router.delete('/deletar/:admId', async (req, res) => {
 
     try {
-        const adm = await Adm.findOne({ 
+        const adm = await sequelize.models.adm.findOne({ 
             where:{
                 id: req.params.admId }
             });
         if(adm==null){
             res.json({ message: "Esse administrador não existe"});
         }else{
-            await Adm.destroy({ 
+            await sequelize.models.adm.destroy({ 
                 where: {
                     id: req.params.admId
                 }
@@ -123,7 +123,7 @@ router.delete('/deletar/:admId', async (req, res) => {
             res.json({ mensagem: "Administrador deletado com sucesso"})
         }
         
-    } catch (err) {
+    }catch (err) {
         return res.send({ error: 'Erro ao excluir' });
     }
     
@@ -139,28 +139,27 @@ router.patch('/alterar/:admId', async (req, res) => {
         senha: req.body.senha
     }
     try {
-        const adm = await Adm.findOne({
+        const adm = await sequelize.models.adm.findOne({
             where:{ 
                 id: req.params.admId
             } 
         })
         
         if(adm==null){
-            
             res.json({ message: "Esse administrador não existe"});
         }else{
             
             const hash = bcrypt.hashSync(novoAdm.senha, 10);
             novoAdm.senha = hash;
-            await adm.update(novoAdm);
+            await sequelize.models.adm.update(novoAdm, {where:{ id: req.params.admId }});
+            
         }
         
-            
         return res.send(adm);
         
         
 
-    } catch (err) {
+    }catch (err) {
         return res.status(400).send({ 
             error: 'Registration failed',
             err: err, });

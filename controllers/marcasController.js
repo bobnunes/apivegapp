@@ -8,7 +8,11 @@ const Marca = require('../models/marca');
 //Exibe toda a lista de marcas de forma pública
 router.get('/', async (req, res) => {
     try {
-        const marca = await sequelize.models.marca.findAll();
+        const marca = await sequelize.models.marca.findAll({
+            include: { 
+                    association: 'produtos'
+                }
+        });
         if (marca == "") {
             return res.json({ mensagem: "Não existe nenhuma marca cadastrada" });
         } else {

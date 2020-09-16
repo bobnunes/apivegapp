@@ -2,6 +2,7 @@ const express = require('express');
 const authMiddleware = require('../middlewares/auth');
 const router = express.Router();
 const { sequelize } = require('../models/index');
+const marca = require('../models/marca');
 
 
 //Exibe toda a lista de produtos de forma pública
@@ -9,10 +10,10 @@ router.get('/', async (req, res) => {
     try {
         const produto = await sequelize.models.produto.findAll({
             include: { 
-                association: 'categoria'    // Falta incluir marcas
+                    association: 'categoria',
+                    association: 'marcas'
                 }
         });
-        console.log(produto);
         if (produto == "") {
             return res.json({ mensagem: "Não existe nenhum produto cadastrado" });
         } else {
@@ -29,6 +30,10 @@ router.get('/:nomeProduto', async (req, res) => {
         const produto = await sequelize.models.produto.findOne({
             where: {
                 id: req.params.nomeProduto
+            },
+            include: {
+                association: 'categoria',
+                association: 'marcas'
             }
         });
 
@@ -47,19 +52,21 @@ router.get('/:nomeProduto', async (req, res) => {
 router.post('/cadastro', async (req, res) => {
 
     try {
-        
-        
-        
-        
-        if (await sequelize.models.produto.findOne({ where: { nome: req.body.nome } }))
-            return res.status(400).send({ error: 'Esse produto já existe' });
+         const { nome, marcas, categoria } = req.body;
+         const marc = await sequelize.models.marca.findAll({where: {
+             id: marcas
+         }})
+         const categ = await sequelize.models.categoria.findAll({where: {
+            id: categoria
+        }});
 
-        const produto  = await sequelize.models.produto.create({
-            nome: req.body.nome,
-            categoriaId: req.body.categoriaId
-        })
-        console.log(produto)
-        return res.send(produto);
+        const prod = await sequelize.models.produto.create({
+            nome: nome
+            });        
+            await prod.addMarcas(marc)
+            await prod.addCategoria(categ)
+         
+         return res.json({ prod });
 
     } catch (err) {
         return res.status(400).send({

@@ -10,15 +10,13 @@ module.exports = {
       },
       produtoId:{
         type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: 'produto', key: 'id' },
+        references: { model: 'produtos', key: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
       },
       marcaId:{
         type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: 'marca', key: 'id' },
+        references: { model: 'marcas', key: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
       },

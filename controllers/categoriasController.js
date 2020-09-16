@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const Categoria = require('../models/categoria');
 const authMiddleware = require('../middlewares/auth');
 const { sequelize } = require('../models');
 
@@ -37,9 +36,6 @@ router.get('/:nomeCategoria', async (req, res) => {
 
     }
 });
-
-
-// Comentar post depois de criar as categorias
 
 //router.use(authMiddleware);
 router.post('/cadastro', async (req, res) => {
